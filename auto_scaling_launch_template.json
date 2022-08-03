@@ -1,0 +1,7 @@
+{
+
+	"ImageId": "ami-090fa75af13c156b4",
+	"InstanceType": "t2.micro",
+	"KeyName": "DemoKeypair",
+	"SecurityGroupIds": ["sg-054c8d32fabb909e0"]
+}
