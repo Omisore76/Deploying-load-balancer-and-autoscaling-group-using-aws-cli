@@ -1,0 +1,22 @@
+Deploying a load balancer and an auto-scaling group Using AWS CLI
+Creating a load balancer
+aws elbv2 create-load-balancer --name my-load-balancer-01 --subnets subnet-058e7c626193db3fc subnet-0d6b934f554a6871f --security-groups sg-054c8d32fabb909e0
+
+Creating target group
+aws elbv2 create-target-group --name mytargetgroup01 --vpc-id vpc-08b173748b92b8969 --protocol HTTP --port 80
+
+Registering instances with the target group
+aws elbv2 register-targets --target-group-arn arn:aws:elasticloadbalancing:us-east-1:658387634975:targetgroup/my-target-group-01/ec848bd5153c76ce --targets Id=i-0579a34f3134cbe56 Id=i-0c18153f72147f04d
+
+Creating a listener for the load balancer
+aws elbv2 create-listener --load-balancer-arn arn:aws:elasticloadbalancing:us-east-1:658387634975:loadbalancer/app/myloadbalancer01/8f473e1c3e56ec0f --protocol HTTP --port 80 --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:us-east-1:658387634975:targetgroup/mytargetgroup01/c295b32b4e43ac50
+
+Verifying the health of the registered targets
+aws elbv2 describe-target-health --target-group-arn arn:aws:elasticloadbalancing:us-east-1:658387634975:targetgroup/mytargetgroup01/c295b32b4e43ac50
+
+Creating a Launch Template for Auto-scaling
+aws ec2 create-launch-template --launch-template-name template01 --launch-template-data file://auto_scaling_launch_template.json
+Note:I created a Json file for the launch template data 
+
+Creating auto-scaling group
+aws autoscaling create-auto-scaling-group --auto-scaling-group-name autoscale001 --launch-template "LaunchTemplateName=template01" --vpc-zone-identifier subnet-058e7c626193db3fc,subnet-0d6b934f554a6871f --target-group-arn arn:aws:elasticloadbalancing:us-east-1:658387634975:targetgroup/mytargetgroup01/c295b32b4e43ac50 --desired-capacity 2 --max-size 4 --min-size 2
